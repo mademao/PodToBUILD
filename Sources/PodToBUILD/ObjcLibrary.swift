@@ -810,11 +810,15 @@ public struct ObjcLibrary: BazelTarget, UserConfigurable, SourceExcludable {
         ))
 
         if lib.includes.count > 0 {
+            // bugfix: includes should specifies Headers/Public/{name}
+            let real_includes = includes.filter { $0.contains("Headers/Public") }.map {
+                "\($0)\(name)"
+            }
             inlineSkylark.append(.functionCall(
                 name: "gen_includes",
                 arguments: [
                     .named(name: "name", value: (name + "_includes").toSkylark()),
-                    .named(name: "include", value: includes.toSkylark()),
+                    .named(name: "include", value: real_includes.toSkylark()),
                 ]
             ))
         }
