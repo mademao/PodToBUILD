@@ -185,17 +185,25 @@ def _link_local_repo(repository_ctx, target_name, url):
     cd = repository_ctx.GetPodRootDir()
     from_dir = url + "/"
     to_dir = cd + "/"
-    all_files = _exec(repository_ctx, ["ls", url]).split("\n")
+    if isinstance(url, bytes):
+        real_url = url.encode()
+    else:
+        real_url = url
+    all_files = _exec(repository_ctx, ["ls", real_url]).split(b'\n')
     # Link all of the files at the root directly
     # ln -s url/* doesn't work.
     for repo_file in all_files:
         if len(repo_file) == 0:
             continue
+        if isinstance(repo_file, bytes):
+            real_repo_file = repo_file.decode()
+        else:
+            real_repo_file = repo_file
         link_cmd = [
             "ln",
             "-sf",
-            from_dir + repo_file,
-            to_dir + repo_file
+            from_dir + real_repo_file,
+            to_dir + real_repo_file
         ]
         _exec(repository_ctx, link_cmd)
 
