@@ -199,13 +199,18 @@ def _link_local_repo(repository_ctx, target_name, url):
             real_repo_file = repo_file.decode()
         else:
             real_repo_file = repo_file
-        link_cmd = [
-            "ln",
-            "-sf",
-            from_dir + real_repo_file,
-            to_dir + real_repo_file
-        ]
-        _exec(repository_ctx, link_cmd)
+
+        from_dir_path = from_dir + real_repo_file
+        to_dir_path = to_dir + real_repo_file
+
+        if not os.path.exists(to_dir_path):
+            link_cmd = [
+                "ln",
+                "-sf",
+                from_dir_path,
+                to_dir_path
+            ]
+            _exec(repository_ctx, link_cmd)
 
 def _needs_update(invocation_info):
     repository_ctx = invocation_info.repository_ctx
